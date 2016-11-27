@@ -1,4 +1,7 @@
 {
-  "name": "wifly setup",
-  "version": "0.0.1"
+  "name": "wiflySetup",
+  "version": "0.0.1",
+  "dependencies": {
+    "serialport": "^4.0.6"
+  }
 }
