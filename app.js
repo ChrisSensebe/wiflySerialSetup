@@ -50,9 +50,9 @@ if(command === COMMANDS.WRITE_AND_LISTEN)
     });
     port.on('open', () =>
     {
-        port.write('$$$\r\nscan\r\n', (err) =>
+        port.write('$$$', () =>
         {
-            console.error(err);
+            console.log('send');
         });
     });
 }
