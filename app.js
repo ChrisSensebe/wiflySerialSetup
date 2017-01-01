@@ -1,58 +1,61 @@
 /**
  * Created by nizural on 27/11/16.
  */
-const COMMANDS =
-{
+const OPTIONS = {
     LIST_PORTS: '--list',
     READ_PORT: '--read',
     WRITE_AND_LISTEN: '--write'
 };
-let command = process.argv[2];
+
+const COMMANDS = ['$$$', '\r\nscan\r\n', '\r\nscan\r\n', '\r\nscan\r\n',];
+
+let option = process.argv[2];
 let portName = process.argv[3];
 let SerialPort = require('serialport');
 
 // list SerialPort ports
-if(command === COMMANDS.LIST_PORTS)
-{
-    SerialPort.list(function (err, ports)
-    {
-        ports.forEach((port) =>
-        {
-            console.log(port.comName);
+if(option === OPTIONS.LIST_PORTS){
+    SerialPort.list(function (err, ports) {
+        ports.forEach((port) => {
+            if(/USB/.test(port.comName)){
+                console.log(port.comName);
+            }
         });
     });
 }
 
 // read from serial port
-if(command === COMMANDS.READ_PORT)
-{
+if(option === OPTIONS.READ_PORT) {
     let port = new SerialPort(portName, {parser: SerialPort.parsers.readline('\r\n')});
     port.on('data', (data) => {
         console.log(data);
     });
-    port.on('error', (err) =>
-    {
+    port.on('error', (err) => {
         console.error(err);
     });
 }
 
 // write to port and listen to response
-if(command === COMMANDS.WRITE_AND_LISTEN)
-{
+if(option === OPTIONS.WRITE_AND_LISTEN) {
     let port = new SerialPort(portName, {parser: SerialPort.parsers.readline('\r\n')});
-    port.on('data', (data) =>
-    {
+    port.on('data', (data) => {
         console.log(data);
     });
-    port.on('error', (err) =>
-    {
+    port.on('error', (err) => {
         console.error(err);
     });
-    port.on('open', () =>
-    {
-        port.write('$$$', () =>
-        {
-            console.log('send');
-        });
+    port.on('open', () => {
+        console.log('port open');
+
+        let currentCommand = 0;
+
+        setInterval(() => {
+            if(currentCommand < COMMANDS.length){
+                console.log('write command ', currentCommand);
+                port.write(COMMANDS[currentCommand++]);
+            } else {
+                process.exit();
+            }
+        }, 6000);
     });
 }
