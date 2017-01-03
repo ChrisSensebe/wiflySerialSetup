@@ -2,7 +2,7 @@
  * Created by nizural on 27/11/16.
  */
 // importing node-serialport (https://github.com/EmergingTechnologyAdvisors/node-serialport)
-let SerialPort = require('serialport');
+const SerialPort = require('serialport');
 // programm commands
 const PROGRAM_COMMANDS = {
     SCAN_WIFI:     'scanWifi',
@@ -10,10 +10,29 @@ const PROGRAM_COMMANDS = {
     CONFIG_MODULE: 'config',
 };
 // commands send to wifly module
-const WIFLY_COMMANDS = {
+const WIFLY_INSTRUCTIONS = {
     SCAN_WIFI:     ['$$$\r\n', 'scan\r\n',],
     RESET_MODULE:  ['$$$\r\n', 'factory RESET_MODULE\r\n'],
-    CONFIG_MODULE: ['$$$\r\n', 'set wlan ssid CEFIM_DL\r\n', 'set wlan phrase fall2015\r\n', 'set wlan join 1\r\n'],
+    CONFIG_MODULE: [
+        '$$$\r\n',
+        'set wlan ssid <network ssid>\r\n',
+        'set wlan phrase <network password>\r\n',
+        'set wlan hide 1\r\n',
+        'set wlan join 1\r\n',
+        'set ip host <host ip>\r\n',
+        'set ip remote <host port>\r\n',
+        'set ip proto 18',
+        'set com remote GET$<route>\r\n',
+        'set q sensor 0xff\r\n',
+        'set opt format 3\r\n',
+        'set opt deviceid <API Key>\r\n',
+        'set opt password <string>\r\n',
+        'set sys autoconn 255\r\n',
+        'set sys wake <value>\r\n',
+        'set sys sleep <value>\r\n',
+        'save\r\n',
+        'reboot\r\n',
+    ],
 };
 // interval between writes in milliseconds
 const COMMANDS_INTERVAL = 5000;
@@ -22,13 +41,13 @@ const portName = process.argv[3];
 
 switch (command){
     case PROGRAM_COMMANDS.SCAN_WIFI:
-        configWifly(portName, WIFLY_COMMANDS.SCAN_WIFI);
+        configWifly(portName, WIFLY_INSTRUCTIONS.SCAN_WIFI);
         break;
     case PROGRAM_COMMANDS.RESET_MODULE:
-        configWifly(portName, WIFLY_COMMANDS.RESET_MODULE);
+        configWifly(portName, WIFLY_INSTRUCTIONS.RESET_MODULE);
         break;
     case PROGRAM_COMMANDS.CONFIG_MODULE:
-        configWifly(portName, WIFLY_COMMANDS.CONFIG_MODULE);
+        configWifly(portName, WIFLY_INSTRUCTIONS.CONFIG_MODULE);
         break;
     default:
         scanPorts();
