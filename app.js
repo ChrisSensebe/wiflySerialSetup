@@ -3,19 +3,46 @@
  */
 // importing node-serialport (https://github.com/EmergingTechnologyAdvisors/node-serialport)
 let SerialPort = require('serialport');
-// commands written to port
-const COMMANDS = ['$$$\r\n', 'scan\r\n', 'scan\r\n',];
+// programm commands
+const PROGRAM_COMMANDS = {
+    SCAN_WIFI:     'scanWifi',
+    RESET_MODULE:  'reset',
+    CONFIG_MODULE: 'config',
+};
+// commands send to wifly module
+const WIFLY_COMMANDS = {
+    SCAN_WIFI:     ['$$$\r\n', 'scan\r\n',],
+    RESET_MODULE:  ['$$$\r\n', 'factory RESET_MODULE\r\n'],
+    CONFIG_MODULE: ['$$$\r\n', 'set wlan ssid CEFIM_DL\r\n', 'set wlan phrase fall2015\r\n', 'set wlan join 1\r\n'],
+};
 // interval between writes in milliseconds
 const COMMANDS_INTERVAL = 5000;
+const command = process.argv[2];
+const portName = process.argv[3];
 
-// search device connected on usb
-if(option === OPTIONS.LIST_PORTS){
+switch (command){
+    case PROGRAM_COMMANDS.SCAN_WIFI:
+        configWifly(portName, WIFLY_COMMANDS.SCAN_WIFI);
+        break;
+    case PROGRAM_COMMANDS.RESET_MODULE:
+        configWifly(portName, WIFLY_COMMANDS.RESET_MODULE);
+        break;
+    case PROGRAM_COMMANDS.CONFIG_MODULE:
+        configWifly(portName, WIFLY_COMMANDS.CONFIG_MODULE);
+        break;
+    default:
+        scanPorts();
+        break;
+}
+
+/**
+ * search for connected serial ports
+ */
+function scanPorts() {
     SerialPort.list(function (err, ports) {
+        console.log('scanning connected ports...');
         ports.forEach((port) => {
-            if(/USB/.test(port.comName)){
-                console.log(port.comName);
-                openPort(port.comName);
-            }
+            console.log(port.comName);
         });
     });
 }
@@ -23,8 +50,9 @@ if(option === OPTIONS.LIST_PORTS){
 /**
  * write an d listen to serial port
  * @param portName : name of the port
+ * @param commands : string[] of commands passed to wifly module
  */
-function openPort(portName) {
+function configWifly(portName, commands) {
     // create port
     let port = new SerialPort(portName, {parser: SerialPort.parsers.readline('\r\n')});
     // log data received from port
@@ -38,13 +66,14 @@ function openPort(portName) {
     // on open, write commands to port
     port.on('open', () => {
         console.log(`port ${portName} open`);
-        // position of current command in COMMANDS
+        // position of current command in commands
         let currentCommand = 0;
         // write a command to port every COMMANDS_INTERVAL milliseconds
         setInterval(() => {
-            if(currentCommand < COMMANDS.length){
-                port.write(COMMANDS[currentCommand++]);
+            if(currentCommand < commands.length){
+                port.write(commands[currentCommand++]);
             } else {
+                console.log('done');
                 process.exit();
             }
         }, COMMANDS_INTERVAL);
