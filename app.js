@@ -12,7 +12,7 @@ const PROGRAM_COMMANDS = {
 // commands send to wifly module
 const WIFLY_INSTRUCTIONS = {
     SCAN_WIFI:     ['$$$\r\n', 'scan\r\n',],
-    RESET_MODULE:  ['$$$\r\n', 'factory RESET_MODULE\r\n'],
+    RESET_MODULE:  ['$$$\r\n', 'factory RESET\r\n'],
     CONFIG_MODULE: [
         '$$$\r\n',
         'set wlan ssid <network ssid>\r\n',
