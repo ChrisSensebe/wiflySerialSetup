@@ -3,13 +3,13 @@
  */
 // importing node-serialport (https://github.com/EmergingTechnologyAdvisors/node-serialport)
 const SerialPort = require('serialport');
-// programm commands
+// programm options
 const PROGRAM_COMMANDS = {
     SCAN_WIFI:     'scanWifi',
     RESET_MODULE:  'reset',
     CONFIG_MODULE: 'config',
 };
-// commands send to wifly module
+// commands for wifly module
 const WIFLY_INSTRUCTIONS = {
     SCAN_WIFI:     ['$$$\r\n', 'scan\r\n',],
     RESET_MODULE:  ['$$$\r\n', 'factory RESET\r\n'],
@@ -36,7 +36,9 @@ const WIFLY_INSTRUCTIONS = {
 };
 // interval between writes in milliseconds
 const COMMANDS_INTERVAL = 5000;
+// command send to program
 const command = process.argv[2];
+// port name
 const portName = process.argv[3];
 
 switch (command){
